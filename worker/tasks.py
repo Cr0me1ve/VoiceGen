@@ -7,7 +7,7 @@ from worker.generators import get_generator
 settings = get_settings()
 
 
-@celery.task(name="worker.tasks.generate", bind=True)
+@celery.task(name="voice_worker.tasks.generate", bind=True)
 def generate(
     self,
     prompt: str,
@@ -18,24 +18,19 @@ def generate(
     **kwargs,
 ):
     """
-    Celery task compatible with GeminiBApiServer.
-    Handles request_type='audio'.
+    Celery task для GenManager (multi_queue).
+    Слушает очередь 'voice', обрабатывает request_type='voice'.
 
-    Extra generator params can be passed two ways:
-
-    1. Via kwargs directly (when caller uses celery.send_task with extra kwargs):
-           {"speaker": "aidar", "sample_rate": 24000}
-
-    2. As JSON prefix in prompt (for callers that can only send prompt string):
-           prompt = '{"speaker":"aidar","sample_rate":24000}\\nТекст для озвучки'
-       The JSON object on the first line is stripped and used as params.
+    Параметры генератора передаются двумя способами:
+    1. Через kwargs: {"speaker": "aidar", "sample_rate": 24000}
+    2. JSON-префиксом в prompt:
+       '{"speaker":"aidar","sample_rate":24000}\nТекст для озвучки'
     """
-    if request_type != "audio":
+    if request_type != "voice":
         raise ValueError(
-            f"VoiceGen only handles request_type='audio', got '{request_type}'"
+            f"VoiceGenWorker handles only request_type='voice', got '{request_type}'"
         )
 
-    # --- Extract params from JSON prefix in prompt (optional) ---
     text = prompt
     inline_params: dict = {}
     first_line, _, rest = prompt.partition("\n")
@@ -44,11 +39,9 @@ def generate(
             inline_params = json.loads(first_line.strip())
             text = rest.strip()
         except json.JSONDecodeError:
-            pass  # treat the whole prompt as plain text
+            pass
 
-    # kwargs take priority over inline JSON
     raw_params = {**inline_params, **kwargs}
-
     generator_name = model_name or settings.default_generator
 
     os.makedirs(settings.temp_dir, exist_ok=True)

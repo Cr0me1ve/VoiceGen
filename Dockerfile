@@ -13,4 +13,4 @@ COPY . .
 
 RUN mkdir -p temp
 
-CMD ["celery", "-A", "worker.celery_app", "worker", "--loglevel=info", "-Q", "celery"]
+CMD ["celery", "-A", "worker.celery_app:celery", "worker", "--loglevel=info", "-Q", "voice", "--concurrency=1", "--pool=solo"]
