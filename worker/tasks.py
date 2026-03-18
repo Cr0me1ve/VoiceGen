@@ -78,7 +78,7 @@ def generate(
     download_url = f"{settings.file_base_url}/{filename}"
     logger.info("[%s] Готово за %.2fs → %s", task_id, elapsed, download_url)
 
-    result = {"download_url": download_url, "filename": filename}
+    result = {"download_url": download_url}
 
     if callback_url:
         logger.debug("[%s] Отправка callback на %s", task_id, callback_url)
