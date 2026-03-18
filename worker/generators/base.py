@@ -51,6 +51,7 @@ class BaseTTSGenerator(ABC):
     PARAMS: dict[str, ParamSpec] = {}
 
     def resolve_params(self, raw: dict) -> dict:
+        print(f"Resolving params for {self.__class__.__name__}: {raw}")
         """
         Merge incoming raw dict with declared defaults, cast to correct types.
         Unknown keys are passed through as-is (for forward compatibility).
