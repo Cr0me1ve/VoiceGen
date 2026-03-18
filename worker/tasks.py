@@ -28,6 +28,13 @@ def generate(
     1. Через kwargs: {"speaker": "aidar", "sample_rate": 24000}
     2. JSON-префиксом в prompt:
        '{"speaker":"aidar","sample_rate":24000}\nТекст для озвучки'
+
+    Возвращает dict:
+        {
+            "download_url": "http://<netbird_ip>:<port>/<filename>",
+            "filename":     "<filename>"
+        }
+    Файл доступен внутри Netbird-сети пока не будет удалён из temp/.
     """
     task_id = self.request.id
     logger.info("[%s] Получена задача: request_type=%s model=%s prompt_len=%d",
@@ -67,19 +74,23 @@ def generate(
         raise
 
     elapsed = time.monotonic() - t_start
-    logger.info("[%s] Готово за %.2fs → %s", task_id, elapsed, file_path)
+    filename = os.path.basename(file_path)
+    download_url = f"{settings.file_base_url}/{filename}"
+    logger.info("[%s] Готово за %.2fs → %s", task_id, elapsed, download_url)
+
+    result = {"download_url": download_url, "filename": filename}
 
     if callback_url:
         logger.debug("[%s] Отправка callback на %s", task_id, callback_url)
-        _send_callback(callback_url, file_path)
+        _send_callback(callback_url, result)
 
-    return file_path
+    return result
 
 
-def _send_callback(url: str, file_path: str) -> None:
+def _send_callback(url: str, result: dict) -> None:
     try:
         import httpx
-        httpx.post(url, json={"result": file_path}, timeout=10)
+        httpx.post(url, json={"result": result}, timeout=10)
         logger.debug("Сallback отправлен: %s", url)
     except Exception as exc:
         logger.warning("Ошибка отправки callback на %s: %s", url, exc)
