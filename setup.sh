@@ -79,16 +79,13 @@ fi
 if [ "$ENV_SKIP" -eq 0 ]; then
     echo ""
     log "Введи параметры подключения к GenManager (Redis внутри Netbird-сети):"
-    read -rp "  GenManager Netbird IP (REDIS_HOST): " REDIS_HOST
-    while [ -z "${REDIS_HOST}" ]; do
-        warn "  IP не может быть пустым"
-        read -rp "  GenManager Netbird IP (REDIS_HOST): " REDIS_HOST
-    done
+    read -rp "  GenManager Netbird IP (REDIS_HOST) [100.95.0.0]: " REDIS_HOST
+    REDIS_HOST="${REDIS_HOST:-100.95.0.0}"
 
     read -rp "  REDIS_PORT [6379]: " REDIS_PORT
     REDIS_PORT="${REDIS_PORT:-6379}"
 
-    read -rsp "  REDIS_PASSWORD: " REDIS_PASSWORD
+    read -rp "  REDIS_PASSWORD: " REDIS_PASSWORD
     echo
 
     read -rp "  DEFAULT_GENERATOR [silero]: " DEFAULT_GENERATOR
