@@ -15,4 +15,4 @@ COPY . .
 
 RUN mkdir -p temp
 
-CMD ["celery", "-A", "worker.celery_app:celery", "worker", "--loglevel=info", "-Q", "voice", "--concurrency=1", "--pool=solo"]
+CMD ["celery", "-A", "worker.celery_app:celery", "worker", "--loglevel=info", "--hostname=voice@%h", "-Q", "voice", "--concurrency=1", "--pool=solo"]
