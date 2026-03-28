@@ -108,9 +108,11 @@ docker compose up -d --build
 ```json
 {
     "prompt": "Привет, мир",
-    "request_type": "voice",
-    "speaker": "aidar",
-    "sample_rate": 24000
+    "request_type": "voice"
+    "kwargs": {
+        "speaker": "aidar",
+        "sample_rate": 24000
+    }
 }
 ```
 
