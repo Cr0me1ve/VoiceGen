@@ -17,6 +17,15 @@ class Settings(BaseSettings):
 
     # Storage
     temp_dir: str = "temp"
+    file_ttl_minutes: int = 15
+
+    # Netbird — этот воркер раздаёт файлы по своему Netbird IP
+    netbird_ip: str = "127.0.0.1"
+    file_server_port: int = 8888
+
+    @property
+    def file_base_url(self) -> str:
+        return f"http://{self.netbird_ip}:{self.file_server_port}"
 
     class Config:
         env_file = ".env"
